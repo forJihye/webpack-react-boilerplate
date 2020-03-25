@@ -1,0 +1,10 @@
+body {
+  background-color: #f8f8f8;
+}
+
+.component {
+  padding: 30px;
+  color: #2196f3;
+  font-size: 18px;
+  background-color: lightsteelblue;
+}
