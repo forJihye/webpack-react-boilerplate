@@ -1,24 +1,17 @@
 
 const path = require('path')
 const HtmlWebPackPlugin = require('html-webpack-plugin')
-// const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { CleanWebpackPlugin} = require('clean-webpack-plugin')
+const devMode = process.env.NODE_ENV !== 'production';
+
 
 module.exports = {
-  mode: 'production',
   entry: './src/index.js',
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist')
   },
-  devServer: {
-    contentBase: path.resolve(__dirname, 'dist'),
-    inline: true,
-    hot: true,
-    host: 'localhost',
-    port: 8000
-  },
-  devtool: 'inline-source-map',
   module: {
     rules: [
       {
@@ -37,7 +30,17 @@ module.exports = {
       },
       {
         test: /\.(sa|sc|c)ss$/,
-        use: ['style-loader', 'css-loader']
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: '../',
+              hmr: process.env.NODE_ENV === 'development'
+            }
+          },
+          'css-loader',
+          'sass-loader'
+        ]
       }
     ]
   },
@@ -47,5 +50,12 @@ module.exports = {
       template: './public/index.html',
       filename: 'index.html'
     }),
+    new MiniCssExtractPlugin({
+      // webpackOptions.output의 동일한 옵션과 유사한 옵션
+      // 두 옵션 모두 선택 사항임
+      filename: devMode ? '[name].css' : '[name].[hash].css',
+      chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
+      ignoreOrder: false // 충돌하는 주문에 대한 경고 제거 사용
+    })
   ]
 }
